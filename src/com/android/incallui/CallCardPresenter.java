@@ -772,6 +772,7 @@ public class CallCardPresenter extends Presenter<CallCardPresenter.CallCardUi>
         Drawable photo = mContext.getResources().getDrawable(resId);
         photo.setAutoMirrored(true);
         return photo;
+    }
 
     public void blacklistClicked(final Context context) {
         if (mPrimary == null) {
