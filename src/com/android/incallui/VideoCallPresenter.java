@@ -23,7 +23,6 @@ import android.os.Handler;
 import android.telecom.AudioState;
 import android.telecom.CameraCapabilities;
 import android.telecom.Connection;
-import android.telecom.Connection.VideoProvider;
 import android.telecom.InCallService.VideoCall;
 import android.telecom.VideoProfile;
 import android.view.Surface;
@@ -986,8 +985,7 @@ public class VideoCallPresenter extends Presenter<VideoCallPresenter.VideoCallUi
     }
 
     @Override
-    public void onUpgradeToVideoFail(int status, Call call) {
-        Log.d(this, "onUpgradeToVideoFail call=" + call);
+    public void onUpgradeToVideoFail(Call call) {
         if (mPrimaryCall == null || !Call.areSame(mPrimaryCall, call)) {
             Log.w(this, "UpgradeToVideoFail received for non-primary call");
         }
@@ -996,24 +994,19 @@ public class VideoCallPresenter extends Presenter<VideoCallPresenter.VideoCallUi
             return;
         }
 
-        if (status == VideoProvider.SESSION_MODIFY_REQUEST_TIMED_OUT) {
-            call.setSessionModificationState(
-                    Call.SessionModificationState.UPGRADE_TO_VIDEO_REQUEST_TIMED_OUT);
-        } else {
-            call.setSessionModificationState(Call.SessionModificationState.REQUEST_FAILED);
+        call.setSessionModificationState(Call.SessionModificationState.REQUEST_FAILED);
 
-            final Call modifyCall = call;
-            // Start handler to change state from REQUEST_FAILED to NO_REQUEST after an interval.
-            mSessionModificationResetHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (modifyCall != null) {
-                        modifyCall
-                            .setSessionModificationState(Call.SessionModificationState.NO_REQUEST);
-                    }
+        final Call modifyCall = call;
+        // Start handler to change state from REQUEST_FAILED to NO_REQUEST after an interval.
+        mSessionModificationResetHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (modifyCall != null) {
+                    modifyCall
+                        .setSessionModificationState(Call.SessionModificationState.NO_REQUEST);
                 }
-            }, SESSION_MODIFICATION_RESET_DELAY_MS);
-        }
+            }
+        }, SESSION_MODIFICATION_RESET_DELAY_MS);
     }
 
     @Override

@@ -122,7 +122,6 @@ public final class Call {
         public static final int WAITING_FOR_RESPONSE = 1;
         public static final int REQUEST_FAILED = 2;
         public static final int RECEIVED_UPGRADE_TO_VIDEO_REQUEST = 3;
-        public static final int UPGRADE_TO_VIDEO_REQUEST_TIMED_OUT = 4;
     }
 
     public static class VideoSettings {

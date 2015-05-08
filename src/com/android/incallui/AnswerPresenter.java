@@ -126,10 +126,11 @@ public class AnswerPresenter extends Presenter<AnswerPresenter.AnswerUi>
 
     @Override
     public void onUpgradeToVideo(Call call) {
-        Log.d(this, "onUpgradeToVideo: " + this + " call=" + call);
-        if (getUi() == null) {
-            Log.d(this, "onUpgradeToVideo ui is null");
-            return;
+        Log.d(this, "onUpgradeToVideo: " + this);
+        if (getUi() != null
+                && call.getSessionModificationState()
+                    == Call.SessionModificationState.RECEIVED_UPGRADE_TO_VIDEO_REQUEST) {
+            processVideoUpgradeRequestCall(call);
         }
         boolean isUpgradePending = isVideoUpgradePending(call);
         InCallPresenter inCallPresenter = InCallPresenter.getInstance();
@@ -289,7 +290,7 @@ public class AnswerPresenter extends Presenter<AnswerPresenter.AnswerUi>
 
         if (mCall[phoneId].getSessionModificationState()
                 == Call.SessionModificationState.RECEIVED_UPGRADE_TO_VIDEO_REQUEST) {
-            InCallPresenter.getInstance().acceptUpgradeRequest(videoState, context);
+            InCallPresenter.getInstance().acceptUpgradeRequest(context);
         } else {
             TelecomAdapter.getInstance().answerCall(mCall[phoneId].getId(), videoState);
         }
@@ -303,22 +304,16 @@ public class AnswerPresenter extends Presenter<AnswerPresenter.AnswerUi>
         }
 
         TelecomAdapter.getInstance().deflectCall(mCall[phoneId].getId(), number);
-
     }
 
     /**
      * TODO: We are using reject and decline interchangeably. We should settle on
      * reject since it seems to be more prevalent.
      */
-    public void onDecline(Context context) {
+    public void onDecline() {
         int phoneId = getActivePhoneId();
         Log.i(this, "onDecline mCallId:" + mCallId + "phoneId:" + phoneId);
-        if (mCall[phoneId].getSessionModificationState()
-                == Call.SessionModificationState.RECEIVED_UPGRADE_TO_VIDEO_REQUEST) {
-            InCallPresenter.getInstance().declineUpgradeRequest(context);
-        } else {
-            TelecomAdapter.getInstance().rejectCall(mCall[phoneId].getId(), false, null);
-        }
+        TelecomAdapter.getInstance().rejectCall(mCall[phoneId].getId(), false, null);
     }
 
     public void onText() {
